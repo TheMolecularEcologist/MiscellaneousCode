@@ -1,0 +1,89 @@
+### diploids, one biallelic locus
+
+
+# # # drift # # # 
+
+	#for one generation at a time
+drift <- function(p, n) rbinom(1, size=2*n, prob=p)/(2*n)
+
+
+# # # mutation # # # 
+
+mutation <- function(p, u) p*(1-u)+(1-p)*u
+
+
+# # # migration # # # 
+
+mig_1way <- function(p_local, p_source, m) p_local*(1-m)+m*p_source
+
+mig_2way <- function(p_vector, m) {
+	#p_vector must be a vector of length 2, and that being the local p and the source p
+	local <- mig_1way(p_vector[1], p_vector[2], m)
+	source <-mig_1way(p_vector[2], p_vector[1], m)
+	return(c(local, source))
+	}
+
+
+# # # generations # # # 
+
+	# go one generation	
+generation <- function(p_vector, n, u, m){
+	#migration happens
+	new_p <- mig_2way(p_vector, m)
+	#mutation happens
+	newer_p <- c(mutation(new_p[1], u), mutation(new_p[2], u))
+	#drift happens
+	newest_p <- c(drift(newer_p[1], n), drift(newer_p[2], n))
+	return(newest_p) #should be a vector of two p values, again, local and source p
+}
+
+	# go multiple generations
+multigen <- function(p_vector, n, u, m, numgens){
+	old_p <- p_vector
+	for(i in 1:numgens){
+		nextgen_p <- generation(old_p, n, u, m)
+		old_p <- nextgen_p
+	}
+	return(old_p)
+}
+
+	#take temporal sample
+temporal <- function(p_vector, n, u, m, numgens, sampling_interval){
+	ancient_p <- multigen(p_vector, n, u, m, numgens-sampling_interval)
+	current_p <- multigen(ancient_p, n, u, m, sampling_interval)
+	return(c(current_p,ancient_p[2])) ##only want the source pop's p at the time in the past!
+}
+	
+	
+	
+	
+##  CREATE SOME DATA   ##
+
+#how many individuals do you want?
+N <- 100
+
+#how many replicates do you want?
+reps <- 100
+	
+#migration & mutation
+mut <- 0.001
+mig <- 0.1
+gens <- 1000
+interval <- 5
+
+#create a template for the data file
+mat <- matrix(NA, ncol=3, nrow=reps)
+
+#make the data
+for(j in 1:reps){
+	#initial conditions
+	starting_p <- runif(2)  #random starting p's sampled from a random uniform distribution
+			# you could change this to a specific number, e.g. starting_p <- c(0.4, 0.6)
+	one_rep <- temporal(starting_p, N, mut, mig, gens, interval)
+	mat[j,] <- one_rep
+}
+
+# if you want to look at the data before saving to file
+mat
+
+write.csv(mat, file="")
