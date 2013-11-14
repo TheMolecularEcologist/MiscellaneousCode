@@ -1,3 +1,16 @@
+# created 13 Nov 2013
+# R code to simulate two-deme system of populations of individuals at one neutral, biallelic locus through time
+
+# code includes ability to view population at 2 time points: intermediate (time t = gens) and final (time t = gens + interval)
+# adjust parameters at bottom of file and add desired file name to run
+
+
+
+
+
+
+
+
 ### diploids, one biallelic locus
 
 
@@ -56,8 +69,10 @@ temporal <- function(p_vector, n, u, m, numgens, sampling_interval){
 	
 	
 	
+
+
 	
-##  CREATE SOME DATA   ##
+##  ##  CREATE SOME DATA   ##  ##
 
 #how many individuals do you want?
 N <- 100
@@ -84,6 +99,9 @@ for(j in 1:reps){
 }
 
 # if you want to look at the data before saving to file
+	#column 1 is local pop current p
+	#column 2 is local pop intermediate p
+	#column 3 is source pop intermediate p
 mat
 
 write.csv(mat, file="")
