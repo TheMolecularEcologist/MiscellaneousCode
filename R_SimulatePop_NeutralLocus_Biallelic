@@ -64,7 +64,7 @@ multigen <- function(p_vector, n, u, m, numgens){
 temporal <- function(p_vector, n, u, m, numgens, sampling_interval){
 	ancient_p <- multigen(p_vector, n, u, m, numgens-sampling_interval)
 	current_p <- multigen(ancient_p, n, u, m, sampling_interval)
-	return(c(current_p,ancient_p[2])) ##only want the source pop's p at the time in the past!
+	return(c(current_p[1],ancient_p)) ##only want the source pop's p at the time in the past!
 }
 	
 	
